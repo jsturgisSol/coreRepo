@@ -1,3 +1,3 @@
 # CORE
 
-Core repo for solomon Dev Ops.
+Core repo for solomon Dev Ops.  Testing.
