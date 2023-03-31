@@ -1,0 +1,27 @@
+import json
+
+def lambda_handler(event, context):
+    response = {
+        "sessionState": {
+            "dialogAction": {
+                "type": "Close",
+                "fulfillmentState": "Fulfilled"
+            },
+            "intent": {
+                "name": "FallbackIntent",
+                "state": "Failed",
+                "confirmationState": "None",
+                "slots": {}
+            },
+            "sessionAttributes": {},
+        },
+        "messages": [
+            {
+                "contentType": "PlainText",
+                "content": "Hello, World!"
+            }
+        ],
+        "requestAttributes": {}
+    }
+
+    return response
