@@ -12,10 +12,10 @@ model = os.environ['OAI_MODEL']
 
 # JSON request body format
 request_body = {
-  "model": model,
-  "temperature": 0.5,
-  "max_tokens": 1000,
-  "messages": []
+    "model": model,
+    "temperature": 0.5,
+    "max_tokens": 1000,
+    "messages": []
 }
 
 # Function to handle incoming events
@@ -23,13 +23,6 @@ def lambda_handler(event, context):
     
     # Extract key1 from the event
     key1 = event['body-json']['key1']
-    
-    #key1_dict = {
-    #  "role": "user",
-    #  "content": "save this thread as test1"}
-    
-    #key1 = key1_dict['content']
-    
     
     # Ensure key1 is a string
     if not isinstance(key1, str):
@@ -73,15 +66,19 @@ def lambda_handler(event, context):
         }
         response = requests.post(endpoint_url, json=request_body, headers=headers)
         
-        # Add the response from the API to the conversation history
         response_json = response.json()
-        for choice in response_json["choices"]:
-            history.append(choice["message"])
-        
-        # Store the updated history in S3
-        s3.put_object(Bucket=os.environ['S3_BUCKET_NAME'], Key='conversation_history.json', Body=json.dumps(history))
-        
-        response_text = response_json["choices"][0]["message"]["content"]
+
+        if "choices" in response_json:
+            for choice in response_json["choices"]:
+                history.append(choice["message"])
+
+            # Store the updated history in S3
+            s3.put_object(Bucket=os.environ['S3_BUCKET_NAME'], Key='conversation_history.json', Body=json.dumps(history))
+            response_text = response_json["choices"][0]["message"]["content"]
+        else:
+            response_text = "An error occurred while processing your request. Please try again."
+            if "error" in response_json:
+                print(f"Error: {response_json['error']}")
 
     return {
         "conversation_history": history,
@@ -106,4 +103,4 @@ def lambda_handler(event, context):
                 }
             ]
         }
-    }
+        }
